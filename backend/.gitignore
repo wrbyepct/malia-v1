@@ -1,0 +1,4 @@
+.env
+__pycache__
+myFile.wave
+voices.json

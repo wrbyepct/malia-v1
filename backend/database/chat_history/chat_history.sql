@@ -1,0 +1,1 @@
+SELECT * FROM chat_history

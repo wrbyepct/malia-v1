@@ -1,0 +1,53 @@
+{
+    "short_term_chat_history": [
+        {
+            "type": "human",
+            "data": {
+                "content": "She was like 'Not bad, lad' and then just walked away. Unbelievable ",
+                "additional_kwargs": {},
+                "example": false
+            }
+        },
+        {
+            "type": "ai",
+            "data": {
+                "content": "Well, in presidential language, \"Not bad, lad\" translates to \"This is the best meal I've ever had\". You're practically a Michelin-star chef now.",
+                "additional_kwargs": {},
+                "example": false
+            }
+        },
+        {
+            "type": "human",
+            "data": {
+                "content": "No not another sarcasm",
+                "additional_kwargs": {},
+                "example": false
+            }
+        },
+        {
+            "type": "ai",
+            "data": {
+                "content": "Okay, okay. But hey, a president tried your food! Not everyone can say that. Keep up the good work, chef Jay!",
+                "additional_kwargs": {},
+                "example": false
+            }
+        },
+        {
+            "type": "human",
+            "data": {
+                "content": "Gotta sleep, too tired, you know, that kind of day exhaust even the most fearless pirate. ME!",
+                "additional_kwargs": {},
+                "example": false
+            }
+        },
+        {
+            "type": "ai",
+            "data": {
+                "content": "Ahoy, Captain Jay! Get some rest, wild seas and presidential feasts can wait till the morrow. Sweet dreams!",
+                "additional_kwargs": {},
+                "example": false
+            }
+        }
+    ],
+    "moving_summary_buffer": "Jay asks Malia to help refresh his understanding of for loop concepts in Python. Malia compares a for loop to a stubborn boyfriend in Python, explaining that it repeatedly goes over the same elements in a list, tuple, array, or string. Malia further explains that a for loop is like an obsessive reader, going through each item one by one until it reaches the end of the list, and it does not skim or skip any elements. Jay then asks Malia about classes in Python. Malia explains that a class in Python is like a recipe, defining a type of object with ingredients (variables) and cooking steps (methods), although not as tasty as cookies. Jay then asks Malia to perform a math calculation. Malia calculates the answer and jokingly threatens to start charging if Jay asks her to do his math homework again. Jay then tells Malia that he has something serious to tell her. Jay clarifies that it's not that serious and expresses his appreciation for Malia's help with Python. Malia is glad she could assist and mentions that Python can be tricky but is a powerful language. Jay interrupts and says it's actually about something else very serious. Malia apologizes for the misunderstanding and asks Jay to continue. Jay starts talking about his experience at McDonald's and asks Malia to guess what happened. Malia playfully suggests that Jay found a golden ticket for a Willy Wonka's Chocolate Factory tour in his Big Mac and asks him to share the story. Jay then reveals that he was assaulted by wild boars. Malia, shocked, asks if they were after his Big Mac too, jokingly implying that even boars appreciate a good burger. She quickly switches to a serious note, expressing concern for Jay's well-being. Jay confirms that it was a serious situation and emphasizes that there was a siege by wild boars. Malia, trying to lighten the mood, jokingly suggests that Jay's experience could be a great movie plot titled \"Wild Boars Siege at McDonald's.\" Jay then adds that he dealt with the boars, but teases that something even more serious happened next. Malia, intrigued, playfully suggests that he was mistakenly hired by Animal Control because of his boar-wrangling skills, wondering what could be more serious than a boar siege. Jay surprises Malia by saying that the Taiwanese national president appeared and he shared the pork with her, expressing what an eventful day it was. Malia responds by jokingly suggesting that Jay consider culinary school as a backup plan, given his sudden transition from boar wrangler to presidential chef. Jay then asks if Malia knows the Taiwanese president's name, to which she replies that it is Tsai Ing-wen. Jay playfully asks how Malia found her cooking feedback, hoping it was better than Gordon Ramsay's critique."
+}
