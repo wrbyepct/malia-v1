@@ -3,7 +3,7 @@ import TypingEffect from "./TypeingEffect";
 type MessageProps = {
   message: { sender: string; text: string; time: string };
   lastMessage: boolean;
-  isMaliaResponding: boolean;
+  isChatStart: boolean;
 };
 
 // Make the newest message render tying effect only if the
@@ -11,7 +11,7 @@ type MessageProps = {
 const ChatMessage: React.FC<MessageProps> = ({
   message,
   lastMessage,
-  isMaliaResponding,
+  isChatStart,
 }) => {
   return (
     <div
@@ -43,7 +43,7 @@ const ChatMessage: React.FC<MessageProps> = ({
           {message.sender =="MALIA" && lastMessage ? (
             <TypingEffect
               message={message.text}
-              isMaliaResponding={isMaliaResponding}
+              isChatStart={isChatStart}
             />
           ) : (
             <p>{message.text}</p>

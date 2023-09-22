@@ -6,10 +6,10 @@ import requests
 import json
 from decouple import config
 from utils.config import VALLEY_GIRL, SAPHIRA
-
+import pygame
 
 ELEVENLABS_API_KEY = config("ELEVENLABS_API_KEY")
-
+pygame.mixer.init()
 # Extract audio file as byte data
 def process_audio_file(file):
     with open(file.filename , "wb") as f:
@@ -51,22 +51,28 @@ def convert_text_to_speech(message):
         print("Request failed when requesting ElevenLabs api")
         return None
     
-    if response.status_code == 200:
+    if response.status_code == 200 and response.content:
+        with open("utils/malia_response.mp3", "wb") as f:
+            f.write(response.content)
+        
+        pygame.mixer.music.load("utils/malia_response.mp3")
+        pygame.mixer.music.play()
+
         return response.content
 
 
-# Provide StreamingResponse
-def get_malia_audio(malia_text):
+# # Provide StreamingResponse
+# def get_malia_audio(malia_text):
     
-    # Convert AI response to audio
-    malia_audio = convert_text_to_speech(malia_text)
-    if malia_audio is None:
-        return HTTPException(status_code=400, detail="Failed to convert AI message to audio")
+#     # Convert AI response to audio
+#     malia_audio = convert_text_to_speech(malia_text)
+#     if malia_audio is None:
+#         return HTTPException(status_code=400, detail="Failed to convert AI message to audio")
 
-    def iterfile():
-        yield malia_audio
+#     def iterfile():
+#         yield malia_audio
 
-    return StreamingResponse(iterfile(), media_type="application/octet-stream")
+#     return StreamingResponse(iterfile(), media_type="application/octet-stream")
     
 
 # Get the list of voice model data in my ElevenLabs voice library    
@@ -81,3 +87,8 @@ def get_voices():
         json.dump(response.json(), f , indent=3)
     
 
+if __name__ == '__main__':
+    import time
+    text = "Jesus crist, can just shut up?"
+    convert_text_to_speech(text)
+    time.sleep(10)

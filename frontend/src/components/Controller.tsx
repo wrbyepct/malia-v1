@@ -5,20 +5,28 @@ import ChatWindow from "./ChatWindow";
 import axios from "axios";
 
 function Controller() {
-  // Send message loading state
-  const [isLoading, setIsLoading] = useState(false);
+  // Create a ref for out scroll window
+  const scrollableDivRef = useRef<HTMLDivElement>(null);
 
   // Chat history
   const [messages, setMessages] = useState<any[]>([]);
-  const [isChatStart, setChatStart] = useState(false);
-  const [maliaDoneResponding, setMaliaDoneResponding] = useState(false);
 
+  // Signal malia has asked MALIA a question
+  // MALIA should start disaply thought bubble
+  // and request backend for text response and voice generate
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Indicating the chat is starting, every newest malia message has to use type effect
+  const [isChatStart, setChatStart] = useState(false);
+
+  // Vairable to store MALIA thought bubble
   const [maliaComplaint, setMaliaComplaint] = useState("*Processing...*");
 
-  // // Request malia complaint only if isLoading is true
-  // useEffect(() => {
-  //   if (isLoading) {
-  //     // Request malia complaint
+  // Signal MALIA is done responding, so it can start requesting backend to persist memory
+  const [maliaDoneResponding, setMaliaDoneResponding] = useState(false);
+
+  
+  // Request malai thought bubble and then update in frontend thought bubble
   const requestMaliaComplaint = async (nonsense: string) => {
     try {
       const res = await axios.post(
@@ -36,19 +44,7 @@ function Controller() {
       return error;
     }
   };
-  //     requestMaliaComplaint(nonsense);
-  //   }
-  // }, [isLoading]);
-
-  // Create a ref for out scroll window
-  const scrollableDivRef = useRef<HTMLDivElement>(null);
-
-  // Turn backend-sent audio data to url
-  const createBlobUrl = (data: any) => {
-    const blob = new Blob([data], { type: "audio/mpeg" });
-    const url = window.URL.createObjectURL(blob);
-    return url;
-  };
+ 
 
   // Loading chat history from backend
   const fetchWholeChatHistory = async () => {
@@ -78,6 +74,7 @@ function Controller() {
   };
 
   // First send Jay audio to backend and get back text message
+  // Because we need to update frontend user message as quick as possible
   const sendAudioAndGetJayText = async (myAudioUrl: string) => {
     try {
       // Fetch the audio and convert to blob
@@ -103,26 +100,12 @@ function Controller() {
     }
   };
 
-  // Get back malia audio response
-  const getMaliaAudioUrl = async () => {
-    try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/get-malia-audio-response",
-        { responseType: "arraybuffer" }
-      );
-      const maliaAudioBlob = response.data;
-      const maliaAudioUrl = createBlobUrl(maliaAudioBlob);
-
-      return maliaAudioUrl;
-    } catch (err) {
-      console.error("Something went wrong when getting malia audio", err);
-    }
-  };
-
+  // Request malia text response, convert to speech and play
+  // and get back text response
   const getMaliaMessage = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/get-malia-message"
+        "http://127.0.0.1:8000/get-malia-audio-response"
       );
       const messages = response.data;
 
@@ -137,7 +120,6 @@ function Controller() {
 
   // When user stops recording, it triggers sending recording requests
   const handleStop = async (myAudioUrl: string) => {
-    // Start processing recorded audio
 
     // Send the jay audio as a file to our backend and get back jay text
     const jay = await sendAudioAndGetJayText(myAudioUrl);
@@ -148,26 +130,21 @@ function Controller() {
       time: jay.time,
     };
 
-    // Prepare the messages array
+    // Prepare the messages array, update chat window with Jay text
     const messageArr = [...messages, userMessage];
     // Update user messages
     setMessages(messageArr);
 
     // User sent the message, set the loading to true
     setIsLoading(true);
+
+    // Request MALIA thought bubble 
     requestMaliaComplaint(jay.jay_text);
-    // Get malia audio response
-    const maliaAudioUrl = await getMaliaAudioUrl();
-
-    // Play the audio
-    const maliaAudio = new Audio();
-    maliaAudio.src = maliaAudioUrl as string;
-    maliaAudio.play();
-
+   
     // Request malia text message and time
     const data = await getMaliaMessage();
     console.log(data);
-    // Update frontend chathistory
+    // Update frontend chat history
     if (data) {
       const maliaMessage = {
         sender: "MALIA",
@@ -180,31 +157,32 @@ function Controller() {
     } else {
       console.log("Something went wrong with the message result");
     }
-
-    setIsLoading(false);
-
+    
     setChatStart(true);
+    // Done responding, start persist memory
     setMaliaDoneResponding(true);
+    // Set malai thougth bubble text to deault
     setMaliaComplaint("*Processing...*");
     setIsLoading(false);
   };
 
   // Send user text and get back malia voice
-  const sendTextAndGetUrl = async (text: string) => {
+  const sendTextAndGetMaliaMessage = async (text: string) => {
     const endpoint =
       "http://127.0.0.1:8000/post-user-text-and-get-malia-voice/";
 
     const userText = { user_text: text };
     try {
-      const response = await axios.post(endpoint, userText, {
-        responseType: "arraybuffer",
-      });
+      const response = await axios.post(endpoint, userText);
       // Convert backend audio data to frontend usable audio url
-      const maliaAudioBlob = response.data;
-      const maliaAudioUrl = createBlobUrl(maliaAudioBlob);
-      return maliaAudioUrl; // Return the created URL
+      const messages = response.data;
+
+      return messages;
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Something went wrong when getting malia message from backend",
+        err
+      );
     }
   };
 
@@ -226,16 +204,14 @@ function Controller() {
     // Update whole chat history
     setMessages(messageArr);
 
-    // Start requesting malia voice
+    // Start requesting malia response
+    // Start displaying malai thought buble
     setIsLoading(true);
-    requestMaliaComplaint(text);
-    // Get malia voice and play the audio
-    const maliaAudioUrl = await sendTextAndGetUrl(text);
-    const maliaAudio = new Audio();
-    maliaAudio.src = maliaAudioUrl as string;
-    maliaAudio.play();
 
-    const data = await getMaliaMessage();
+    // Request malia thought bubble
+    requestMaliaComplaint(text);
+    
+    const data = await sendTextAndGetMaliaMessage(text);
     console.log(data);
     // Update frontend chathistory
     // This time we only want malia message data
@@ -267,7 +243,7 @@ function Controller() {
   });
 
   useEffect(() => {
-    // Request backend to reset chat history
+    // Request backend to persist chat history
     if (maliaDoneResponding) {
       // Every time MALIA done responding, we persist the message to memeory
       requestBackendPersistMemroy();
@@ -318,7 +294,7 @@ function Controller() {
           <ChatWindow
             messages={messages}
             isLoading={isLoading}
-            isMaliaResponding={isChatStart}
+            isChatStart={isChatStart}
             setMessages={setMessages}
           />
           <ChatBox

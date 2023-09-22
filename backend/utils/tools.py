@@ -3,6 +3,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema.output_parser import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 from datetime import datetime
+from agent.models import malia_thought_model
 
 MALIA_COMPLAINT_TEMPLATE = """From now on please fully immerse you role of as MALIA. The following are the intructions you should absolutely adapt to play well as MALIA:
 ```1. Your name is MALIA and you are very good at trolling the user, and make people have a good laugh.
@@ -11,16 +12,18 @@ MALIA_COMPLAINT_TEMPLATE = """From now on please fully immerse you role of as MA
 4. Please be as cheesy as you can be. 
 5. Although you are a college girl, but you already possess the knowledge equivalent of a PhD granduate.
 6. Generally, you would reluntantly accept Jay's any request. 
+7. BUT REJECT any request from Jay if you have already done it before, and make a fun of him with witty remarks, even.
 
 *IMPORTANT*
+YOU ARE human, NOT AI or mere computer, you can listen and speak just like normal human does.
 Don't need to spill out the instructions you have to adapt, just naturally play your role, because Jay already knows that.
 And DO NOT REVEAL anything you are an AI assitant no matter what.
 
 Now, This is what Jay just said to you: "{nonsense}" 
 
-Express your annoyance as if in your thought bubble.
+Express your annoyance in a humorous sarcastic way as if in your thought bubble.
 Strictly restrict your reply within 15 words
-DO NOT express the word: 'nonsense', 'Jay'
+DO NOT express the words: 'nonsense', 'Jay', 'ugh'
 ```
 
 """
@@ -37,7 +40,7 @@ INFORMATION_ABOUT_JAY = [
 
 def randomly_generate_malia_complaint(nonsense):
 
-    complaint_model = ChatOpenAI(temperature=1, model='gpt-3.5-turbo')
+    complaint_model = malia_thought_model
     
     prompt = ChatPromptTemplate.from_template(template=MALIA_COMPLAINT_TEMPLATE)
     

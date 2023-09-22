@@ -4,18 +4,18 @@ import React, { useState, useEffect} from "react";
 type Props = {
   message: string;
   typingSpeed?: number;
-  isMaliaResponding: boolean;
+  isChatStart: boolean;
 };
 
 const TypingEffect: React.FC<Props> = ({
   message,
-  isMaliaResponding,
+  isChatStart,
   typingSpeed = 50
 }) => {
   const [displayedMessage, setDisplayedMessage] = useState("");
 
   useEffect(() => {
-    if (isMaliaResponding) {
+    if (isChatStart) {
       // Only when the user sends the message the loading starts
       // and we display the typing effect
       if (displayedMessage.length < message.length) {
@@ -28,7 +28,7 @@ const TypingEffect: React.FC<Props> = ({
           setDisplayedMessage(message);
         }
     
-  }, [message, isMaliaResponding, displayedMessage])
+  }, [message, isChatStart, displayedMessage])
   
     
   return <p>{displayedMessage}</p>;

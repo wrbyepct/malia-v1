@@ -18,21 +18,16 @@ from utils.audio_handle import (
     get_voices, 
     convert_audio_to_text,
     process_audio_file,
-    get_malia_audio
 )
 from utils.tools import (
     randomly_generate_malia_complaint,
     get_current_time,
     reformat_to_hour_min
 )
-from utils.config import *
+from utils.chat_response import get_malia_response
 
-from datetime import datetime
 from dataclasses import dataclass
 
-from dotenv import find_dotenv, load_dotenv
-
-_ = load_dotenv(find_dotenv())
 
 # Initiate App
 app = FastAPI()
@@ -144,25 +139,8 @@ async def get_user_text(file: UploadFile = File(...)):
 @app.get("/get-malia-audio-response")
 async def provide_malia_audio():
     
-    # Get malia text
-    malia_text = talk_shit_with_malia(
-        user_message=message_buffer.jay_text, 
-        malia=malia,
-        message_buffer=message_buffer
-    )
+    return await get_malia_response(malia=malia, message_buffer=message_buffer)
     
-    return get_malia_audio(malia_text=malia_text)
-
-# Provide frontend malia text message and time
-@app.get("/get-malia-message")
-async def get_malia_message():
-    # Use message buffer to get recent 2 chat history
-    malia_time = message_buffer.malia_time
-    
-    h_m = reformat_to_hour_min(datetime=malia_time)
-    
-    return {'malia_text': message_buffer.malia_text, 'malia_time': h_m}
-
 
 # Accept user text and send back AI voice response
 @app.post("/post-user-text-and-get-malia-voice/")
@@ -174,15 +152,7 @@ async def get_audio_using_text(user_data: dict):
     message_buffer.jay_text = jay_text
     message_buffer.jay_time = jay_sent_time
     
-    # Get malia text
-    malia_text = await talk_shit_with_malia(
-        user_message=jay_text, 
-        malia=malia,
-        message_buffer=message_buffer
-    )
-    
-    # convert malia text to audio 
-    return get_malia_audio(malia_text=malia_text)
+    return await get_malia_response(malia=malia, message_buffer=message_buffer)
 
 
 # Persist dialogues to memory 

@@ -4,9 +4,6 @@ from langchain.schema import Document
 # Splitter
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-# Model
-from langchain.chat_models import ChatOpenAI
-
 # Embedding Support
 from langchain.embeddings import OpenAIEmbeddings
 
@@ -23,6 +20,8 @@ import numpy as np
 # Other tools
 import time
 
+# My own modules
+from agent.models import chuck_summary_model, advanced_summary_model
 
 # First split the documents
 def split_text_to_docs(text):
@@ -65,11 +64,7 @@ def select_closest_chunks(vectors):
 
 
 def summarize_each_chunk(docs, selected_chunk_indices):
-    chunk_sum_llm = ChatOpenAI(
-        temperature=0,
-        max_tokens=1000,
-        model = 'gpt-3.5-turbo-0613'
-    )
+
     chunk_sum_template = """
     You will be given a part of section transript from a podcast. 
     The section will be enclosed in triple backticks (```)
@@ -88,7 +83,7 @@ def summarize_each_chunk(docs, selected_chunk_indices):
 
     # Use summarize chain to do the work
     chunk_sum_chain = load_summarize_chain(
-        llm=chunk_sum_llm,
+        llm=chuck_summary_model,
         prompt=chunk_sum_prompt,
         chain_type="stuff"
     )
@@ -120,11 +115,6 @@ def get_final_summary(summary_list):
     # Convert it back to a document
     summaries = Document(page_content=summaries)
 
-    final_sum_llm = ChatOpenAI(
-        temperature=0,
-        model='gpt-4',
-        request_timeout=120
-    )
     final_sum_template = """
     You are a professional neuroscientist and very capable of giving reader \
     great insights from neuroscience articles.
@@ -142,7 +132,7 @@ def get_final_summary(summary_list):
     final_sum_prompt = PromptTemplate(template=final_sum_template, input_variables=["text"])
 
     final_sum_chain = load_summarize_chain(
-        llm=final_sum_llm,
+        llm=advanced_summary_model,
         prompt=final_sum_prompt,
         chain_type="stuff",
         verbose=True

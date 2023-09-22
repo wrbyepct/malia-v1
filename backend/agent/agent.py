@@ -1,5 +1,4 @@
 
-from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationSummaryBufferMemory
 
 from langchain.agents import OpenAIFunctionsAgent, AgentExecutor, AgentType, initialize_agent
@@ -9,11 +8,12 @@ from agent.agent_tools import tools
 from database.memory.short_term_memory import load_short_term_memory_from_json
 from utils.template import MALIA_INSTRUCTION, get_prompt
 
+from agent.models import malia_model, short_term_memory_model
 # Prepare short-term memory for the model
 def get_summary_memory(data):
     # Create memory
     sum_memory = ConversationSummaryBufferMemory(
-        llm=ChatOpenAI(temperature=0.5, model='gpt-3.5-turbo'),
+        llm=short_term_memory_model,
         ai_prefix="MALIA",
         human_prefix="Jay",
         memory_key='chat_history',
@@ -43,7 +43,7 @@ def get_agent():
     prompt = get_prompt()
     agent = OpenAIFunctionsAgent(
         tools=tools,
-        llm=ChatOpenAI(temperature=0.9, model='gpt-4-0613', max_tokens=512),
+        llm=malia_model,
         verbose=True,
         prompt=prompt,
     )

@@ -3,11 +3,11 @@ import ChatMessages from "./ChatMessages";
 type Props = {
   messages: any;
   isLoading: boolean;
-  isMaliaResponding: boolean;
+  isChatStart: boolean;
   setMessages:any;
 };
 
-function ChatWindow({ messages, isLoading, setMessages, isMaliaResponding }: Props) {
+function ChatWindow({ messages, isLoading, setMessages, isChatStart }: Props) {
   const clearChatWindow = () => {
     setMessages([]);
   }
@@ -19,7 +19,7 @@ function ChatWindow({ messages, isLoading, setMessages, isMaliaResponding }: Pro
               key={index + message.sender}
               message={message}
               lastMessage={index === messages.length - 1}
-              isMaliaResponding={isMaliaResponding}
+              isChatStart={isChatStart}
           />
         })}
 

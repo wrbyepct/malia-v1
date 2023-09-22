@@ -1,1 +1,4 @@
-SELECT * FROM chat_history
+SELECT * FROM chat_history;
+
+-- 2023-09-07 11:26:39
+-- 2023-09-07 11:26:52

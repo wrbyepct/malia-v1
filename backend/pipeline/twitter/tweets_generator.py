@@ -1,15 +1,17 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
+from agent.models import advanced_summary_model
 
 
 def generate_tweets(podcast):
 
+    link = "https://www.youtube.com/watch?v=yixIc1Ai6jM&t=169s"
+    title = "Marc Andreessen: How Risk Taking, Innovation & Artificial Intelligence Transform Human Experience"
+    
     podcast_link = podcast['url']
-    podcast_tile = podcast['title']
+    podcast_title = podcast['title']
     podcast_summary = podcast['summary']
-
-    tweet_model = ChatOpenAI(temperature=0, model='gpt-4')
 
     template = """
     PODCAST LINK: {podcast_link}
@@ -39,9 +41,9 @@ def generate_tweets(podcast):
 
     prompt = ChatPromptTemplate.from_template(template=template)
     
-    chain = prompt | tweet_model | StrOutputParser()
+    chain = prompt | advanced_summary_model | StrOutputParser()
 
-    q = {"podcast_summary": podcast_summary, "podcast_link": podcast_link, "podcast_title": podcast_tile}
+    q = {"podcast_summary": podcast_summary, "podcast_link": link, "podcast_title": title}
 
     twitter_thread = chain.invoke(q)
 

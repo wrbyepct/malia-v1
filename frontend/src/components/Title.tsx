@@ -8,32 +8,19 @@ type Props = {
   maliaComplaint: string;
 };
 
-// const refreshBtn = (
-//   <svg
-//     xmlns="http://www.w3.org/2000/svg"
-//     fill="none"
-//     viewBox="0 0 24 24"
-//     strokeWidth={1.5}
-//     stroke="currentColor"
-//     className="w-6 h-6"
-//   >
-//     <path
-//       strokeLinecap="round"
-//       strokeLinejoin="round"
-//       d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-//     />
-//   </svg>
-// );
 
 function Title({ setMessages, isLoading, maliaComplaint }: Props) {
+  // Signal MALIA's memeory is being resetting
   const [isResetting, setIsResetting] = useState(false);
   const [alert, setAlert] = useState("Hey, you are not gonna acutally do it, are you...?")
 
   const resetChatHistory = async () => {
+    // Alert user the memory is about to be reset
     const userConfirmed = window.confirm(alert);
     if (userConfirmed) {
       setIsResetting(true);
       
+      // Request backend to reset memory and chat history
       await axios
       .get("http://127.0.0.1:8000/reset")
       .then((res) => {
@@ -60,7 +47,7 @@ function Title({ setMessages, isLoading, maliaComplaint }: Props) {
       {/* If resetting memory, display 'Oh no' */}
       { isResetting ? 
       (<p className="text-white text-center text-4xl px-20 py-10 animate-pulse">What? wait! Oh no...</p>) 
-      // If isLoading, display thought complaint
+      // If isLoading, display thought complaint with pulsing effect
       : isLoading ?  (
           // Display malia's complaint when it's loading
           <div className="text-white text-center text-lg px-10 py-10">
@@ -71,7 +58,7 @@ function Title({ setMessages, isLoading, maliaComplaint }: Props) {
         <div >
           <div className="text-white text-center text-4xl px-10 py-7">
             <div className="mb-5">You speak</div>
-            <div >MALIA listens and remembers...</div>
+            <div>MALIA listens and remembers...</div>
           </div>
          <div className="flex">
           <button
@@ -85,18 +72,9 @@ function Title({ setMessages, isLoading, maliaComplaint }: Props) {
         </div>
         )}
       
-      
     </div>
 
-// {isLoading && (
-//   // Display malia's complaint when it's loading
-//   <div className="text-center">
-//     <p className="font-bold mt-10 text-gray-200">MALIA's thought bubble:</p>
-//     <p className="font-light italic mt-2 animate-pulse text-gray-200">{maliaComplaint}</p> 
-//   </div>
-// )} 
-   
-    
+
   );
 }
 

@@ -40,7 +40,7 @@ async def scrape_video_transcript(url=""):
         print("waiting for no thank button...")
         # Sometimes the no thanks button won't appear
         try:
-            await page.wait_for_selector(no_thanks_selector, timeout=5000)
+            await page.wait_for_selector(no_thanks_selector, timeout=10000)
             await page.click(no_thanks_selector)
         except Exception as e:
             print(e)
