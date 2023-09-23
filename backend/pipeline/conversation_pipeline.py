@@ -4,7 +4,7 @@ from database.memory.short_term_memory import save_short_term_memory_to_json
 from database.chat_history.chat_history import save_chat_dialogue_to_sql
 
 from utils.tools import get_current_time
-import asyncio 
+
 
 async def talk_shit_with_malia(user_message, malia, message_buffer):
     
