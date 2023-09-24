@@ -68,5 +68,3 @@ MALIA has her own character. She will turn down repeated, unnecessary requests w
 ## 📌 Note
 This project is a demonstration of MALIA's capabilities and is not intended for public use or download. The focus here is to showcase the innovative features and the unique personality of MALIA. Feel free to explore and understand the intricacies of developing a chatbot with a strong personality and advanced features.
 
-## 🌟 Conclusion
-M.A.L.I.A. is not just a chatbot; she is a companion with a vibrant personality, designed to make interactions more human-like and engaging. Explore this repository to understand the depth of features and the technology stack that makes MALIA a standout project in the realm of chatbots.
