@@ -12,7 +12,7 @@ Thanks to her advanced long-term memory, MALIA can chat with users with flow and
 
 ### 🗣️ **Natural Voice Interaction:**
 Interact with MALIA through voice or text, and she will reply with her true natural voice and typed messages, making the conversation more engaging and friend-like.
-This is achieved by using ElevenLabs' voice API. The model ID I use is E2Cf5sotGBcJZ0X8nWeQ, with stability of 0.23 and similarity of 0.9
+This is achieved by using ElevenLabs' voice API. The model ID I use is E2Cf5sotGBcJZ0X8nWeQ, with stability set to 0.23 and similarity 0.9
 
 ### 🎥 **Automatic Youtube Scraping, Summary, and Tweet-Sending Pipeline:**
 MALIA can summarize specified podcasts from Andrew Huberman, scrape subtitles, convert them to digestible tweets, and send them directly to your Twitter!
@@ -49,6 +49,7 @@ MALIA has her own character. She will turn down repeated, unnecessary requests w
 
 ## 📜 Chatbot Response
 - **OpenAI**
+- **ElevenLabs (voice)**
 
 ## 🌈 Visual Representation of MALIA's Features
 ```
