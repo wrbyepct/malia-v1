@@ -22,15 +22,15 @@ chuck_summary_model = ChatOpenAI(
         model = 'gpt-3.5-turbo-0613'
     )
 
-
+# Tweets generator
 advanced_summary_model = ChatOpenAI(
-    temperature=0,
-    model='gpt-4',
+    temperature=0.5,
+    model='gpt-4-0613',
     request_timeout=120
-    )
+)
 
 malia_thought_model = ChatOpenAI(
-    temperature=1, 
-    model='gpt-3.5-turbo'
+    temperature=0.9, 
+    model='gpt-4-0613'
 )
 

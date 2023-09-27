@@ -23,6 +23,9 @@ import time
 # My own modules
 from agent.models import chuck_summary_model, advanced_summary_model
 
+# summary templates
+from utils.template import CHUNK_SUMMARY_TEMPLATE, FULL_SUMMARY_TEMPLATE
+
 # First split the documents
 def split_text_to_docs(text):
     text_splitter = RecursiveCharacterTextSplitter(
@@ -65,19 +68,7 @@ def select_closest_chunks(vectors):
 
 def summarize_each_chunk(docs, selected_chunk_indices):
 
-    chunk_sum_template = """
-    You will be given a part of section transript from a podcast. 
-    The section will be enclosed in triple backticks (```)
-    Your goal is to give a summary of this section with domain knowledge of \
-    professional neuroscience so that a reader will have a full understanding of what this \
-    section of podcast is about.
-    Your response should be at leat three paragraphs and fully encompasses what was \
-    said in the part of podcast.
-
-    SECTION OF TRANSCRIPT: ```{text}```
-
-    FULL SUMMARY: 
-    """
+    chunk_sum_template = CHUNK_SUMMARY_TEMPLATE
 
     chunk_sum_prompt = PromptTemplate(template=chunk_sum_template, input_variables=['text'])
 
@@ -115,19 +106,7 @@ def get_final_summary(summary_list):
     # Convert it back to a document
     summaries = Document(page_content=summaries)
 
-    final_sum_template = """
-    You are a professional neuroscientist and very capable of giving reader \
-    great insights from neuroscience articles.
-
-    You are about to be given a series of summaries wrapped in triple backticks from a neuroscience podcast by Andrew Huberman.
-    Your goal is to give an insightful summary from those combined chunk of summaries, \
-    so that the reader should be able to learn the essence and salient points from this podcast.
-    Your response should be at leat three paragraphs and fully encompass what was said in those summaries.
-
-    SERIES OF SUMMARIES: ```{text}```
-
-    INSIGHTFUL SUMMARY:
-    """
+    final_sum_template = FULL_SUMMARY_TEMPLATE
 
     final_sum_prompt = PromptTemplate(template=final_sum_template, input_variables=["text"])
 
@@ -167,7 +146,7 @@ def start_summarize(text):
 
     print("Saving final summary into text file...")
     print()
-    with open("huberman_summary.txt", "w", encoding='utf-8') as f:
+    with open("full_summary.txt", "w", encoding='utf-8') as f:
         f.write(final_summary)
 
     return final_summary

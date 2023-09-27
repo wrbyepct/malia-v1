@@ -3,8 +3,6 @@ from utils.tools import reformat_to_hour_min
 from utils.audio_handle import convert_text_to_speech
 
 
-
-
 async def get_malia_response(malia, message_buffer):
     
     # Get malia text
@@ -14,6 +12,7 @@ async def get_malia_response(malia, message_buffer):
         message_buffer=message_buffer
     )
     
+    # Record malia response time
     malia_time = message_buffer.malia_time
     
     h_m = reformat_to_hour_min(datetime=malia_time)

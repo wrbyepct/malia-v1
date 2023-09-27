@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from agent.agent import get_agent
-from pipeline.conversation_pipeline import talk_shit_with_malia, persist_to_memory
+from pipeline.conversation_pipeline import persist_to_memory
 
 # Memory database
 from database.memory.long_term_memory import delete_vdb
@@ -187,9 +187,3 @@ async def provide_malia_complaint(data: dict):
 
 
     
-    
-
-    
-    
-    
-

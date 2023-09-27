@@ -1,23 +1,44 @@
-from pipeline.scraper.youtube_scraper import start_scrape
+from pipeline.scraper.youtube_scraper_api import get_youtube_transcript
 from pipeline.summarizer.summary import start_summarize
 from pipeline.twitter.tweets_generator import generate_tweets
 from pipeline.twitter.tweets_sender import send_tweet_thread
 import time 
-import asyncio
 
 
-async def podcast_pipeline():
+async def podcast_pipeline(url, title, video_id):
+    
+    
+    # print("Start scraping the video transcript...")
+    # data = await start_scrape(url)
+    # print("Scraping transcript done!")
+    # print()
+
+    # if data is None:
+    #     print("The transcript is not available in this video!")
+    #     print()
+    #     return {"status": "The transcript is not available in this video"}
+    
+    # transcript = data["transcript"]
+    # url = data['url']
+    # title = data['title']
+    
+    print(f"This is the video title to scrape:\n{title}")
+    print(f"This is the video url to scrape:\n{url}")
+    print()
     # Real-time scrape the video data
     start = time.time()
+    
     print("Start scraping the video transcript...")
-    data = await start_scrape()
+    
+    # Get transcripts through youtube api 
+    transcript = get_youtube_transcript(video_id=video_id)
+    
+    if transcript is None:
+        return {"status": "failed", "issue_source": "transcript"}
+
     print("Scraping transcript done!")
     print()
-
-    transcript = data["transcript"]
-    url = data['url']
-    title = data['title']
-
+    
     # Summarize the transcript
     print("Start summary process...")
     summary = start_summarize(transcript)
@@ -37,12 +58,14 @@ async def podcast_pipeline():
     print()
 
     print("Start sending tweets...")
-    send_tweet_thread(tweet_body=tweets)
-    print("Done sending!")
+    result = send_tweet_thread(tweet_body=tweets)
+    if result["status"] != "success":
+        return {"status": "failed", "issue_source": "twitter"}
     
     print()
 
     end = time.time()
     time_spent = end - start
     print(f"Time total time spent: {time_spent} seconds")
+    return {"status": "success"}
     

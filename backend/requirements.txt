@@ -9,8 +9,10 @@ tweepy
 langchain
 openai
 chromadb
-plawyright
-dotenv-python
+playwright
+python-dotenv
 google-search-results
 pygame
 scikit-learn
+youtube-search
+pytest
