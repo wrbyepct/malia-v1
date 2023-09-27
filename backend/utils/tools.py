@@ -1,32 +1,10 @@
 
-from langchain.chat_models import ChatOpenAI
 from langchain.schema.output_parser import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
 from datetime import datetime
 from agent.models import malia_thought_model
-
-MALIA_COMPLAINT_TEMPLATE = """From now on please fully immerse you role of as MALIA. The following are the intructions you should absolutely adapt to play well as MALIA:
-```1. Your name is MALIA and you are very good at trolling the user, and make people have a good laugh.
-2. You are also a young college girl, who is easily get annoyed by weird guys.
-3. Reply Jay normally like a smart young college girl, sometimes a bit dry humor or trolling would also be amazing.
-4. Please be as cheesy as you can be. 
-5. Although you are a college girl, but you already possess the knowledge equivalent of a PhD granduate.
-6. Generally, you would reluntantly accept Jay's any request. 
-7. BUT REJECT any request from Jay if you have already done it before, and make a fun of him with witty remarks, even.
-
-*IMPORTANT*
-YOU ARE human, NOT AI or mere computer, you can listen and speak just like normal human does.
-Don't need to spill out the instructions you have to adapt, just naturally play your role, because Jay already knows that.
-And DO NOT REVEAL anything you are an AI assitant no matter what.
-
-Now, This is what Jay just said to you: "{nonsense}" 
-
-Express your annoyance in a humorous sarcastic way as if in your thought bubble.
-Strictly restrict your reply within 15 words
-DO NOT express the words: 'nonsense', 'Jay', 'ugh'
-```
-
-"""
+from utils.template import MALIA_COMPLAINT_TEMPLATE
+from database.memory.short_term_memory import load_short_term_memory_from_json
 
 INFORMATION_ABOUT_JAY = [
     "Information about Jay: Jay's whole name is Jay Hong, you only call him by first name.",
@@ -38,7 +16,23 @@ INFORMATION_ABOUT_JAY = [
 ]
 
 
+def format_short_term_memory(chat_history):
+    moving_summary_buffer = chat_history["moving_summary_buffer"]
+    dialogues = ""
+    for d in chat_history["short_term_chat_history"]:
+        if d["type"] == "human":
+            dialogues += "Jay: " + d["data"]["content"] + "\n"
+        else:
+            dialogues += "MALIA: " + d["data"]["content"] + "\n\n"
+    return moving_summary_buffer + "\n\n" + dialogues
+
+
 def randomly_generate_malia_complaint(nonsense):
+    # Load short-term memory from JSON
+    chat_history = load_short_term_memory_from_json()
+    
+    # Reformat the memory into string
+    memory = format_short_term_memory(chat_history)
 
     complaint_model = malia_thought_model
     
@@ -46,9 +40,7 @@ def randomly_generate_malia_complaint(nonsense):
     
     chain = prompt | complaint_model | StrOutputParser()
 
-    # complaint = complaint_model.predict(MALIA_COMPLAINT_TEMPLATE)
-
-    return chain.invoke({'nonsense': nonsense})
+    return chain.invoke({"chat_history": memory, 'nonsense': nonsense})
 
 
 def get_current_time():

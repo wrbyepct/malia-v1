@@ -28,7 +28,7 @@ def generate_tweets(video):
 
 
 def rewrite_tweets(tweet):
-    template = REWRITE_TWEET_TEMPLATE
+    template = TWEET_THREAD_TEMPLATE
 
     prompt = ChatPromptTemplate.from_template(template=template)
     

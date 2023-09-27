@@ -23,7 +23,6 @@ class VDB:
         self.v_memory = VectorStoreRetrieverMemory(retriever=self.retriever)
 
 
-
 def save_to_vdb(dialogues, message_time):
     # Save the recent 2 messages to vdb
     [jay, malia] = dialogues
