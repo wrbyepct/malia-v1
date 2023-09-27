@@ -1,6 +1,6 @@
-# M.A.L.I.A. - Your Cheeky, Smart, and Sassy Voice Assistant
+# M.A.L.I.A. - Your All-in-One Sassy Voice Assistant
 
-Welcome to the repository of **M.A.L.I.A.**, a web-based chatbot powered by OpenAI with a strong and unique personality, designed to be your assistant and friend. MALIA is not just any chatbot; she is cheeky, sarcastic, very smart, and specializes in Psychology, Neuroscience, and Data Science. Enhanced by LangChain's agent library, she is able to perform more useful tasks that can not be achieved by ChatGPT 3.5, solely on her decision! Dive in to explore the myriad of features and capabilities MALIA brings to the table!
+Welcome to the repository of **M.A.L.I.A.**, a web-based chatbot powered by OpenAI with a strong and unique personality, designed to be your assistant and friend. MALIA is not just any chatbot; she is cheeky, sarcastic, very smart, and specializes in Psychology, Neuroscience, and Data Science. Enhanced by LangChain's agent library, she is able to perform more useful tasks that can not be achieved by ChatGPT 3.5, solely based on her own decision! Dive in to explore the myriad of features and capabilities MALIA brings to the table!
 
 ## 🌟 Features
 
@@ -12,6 +12,7 @@ Thanks to her advanced long-term memory, MALIA can chat with users with flow and
 
 ### 🗣️ **Natural Voice Interaction:**
 Interact with MALIA through voice or text, and she will reply with her true natural voice and typed messages, making the conversation more engaging and friend-like.
+This is achieved by using ElevenLabs' voice API. The model ID I use is E2Cf5sotGBcJZ0X8nWeQ, with stability set to 0.23 and similarity 0.9
 
 ### 🎥 **Automatic Youtube Scraping, Summary, and Tweet-Sending Pipeline:**
 MALIA can summarize specified podcasts from Andrew Huberman, scrape subtitles, convert them to digestible tweets, and send them directly to your Twitter!
@@ -48,6 +49,7 @@ MALIA has her own character. She will turn down repeated, unnecessary requests w
 
 ## 📜 Chatbot Response
 - **OpenAI**
+- **ElevenLabs (voice)**
 
 ## 🌈 Visual Representation of MALIA's Features
 ```
@@ -66,5 +68,3 @@ MALIA has her own character. She will turn down repeated, unnecessary requests w
 ## 📌 Note
 This project is a demonstration of MALIA's capabilities and is not intended for public use or download. The focus here is to showcase the innovative features and the unique personality of MALIA. Feel free to explore and understand the intricacies of developing a chatbot with a strong personality and advanced features.
 
-## 🌟 Conclusion
-M.A.L.I.A. is not just a chatbot; she is a companion with a vibrant personality, designed to make interactions more human-like and engaging. Explore this repository to understand the depth of features and the technology stack that makes MALIA a standout project in the realm of chatbots.
