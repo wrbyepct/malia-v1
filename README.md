@@ -2,7 +2,8 @@
 
 Welcome to the repository of **M.A.L.I.A.**, a web-based chatbot powered by OpenAI with a strong and unique personality, designed to be your assistant and friend. MALIA is not just any chatbot; she is cheeky, sarcastic, very smart, and specializes in Psychology, Neuroscience, and Data Science. Enhanced by LangChain's agent library, she is able to perform more useful tasks that can not be achieved by ChatGPT 3.5, solely based on her own decision! Dive in to explore the myriad of features and capabilities MALIA brings to the table!
 
-## Video demo - https://www.youtube.com/watch?v=cyOpJdShq7E
+## Video demo:
+{{video https://www.youtube.com/watch?v=cyOpJdShq7E}}
 
 ## 🌟 Features
 
