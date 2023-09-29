@@ -1,4 +1,4 @@
-from pipeline.conversation_pipeline import talk_shit_with_malia
+from pipelines.conversation_pipeline import talk_shit_with_malia
 from utils.tools import reformat_to_hour_min
 from utils.audio_handle import convert_text_to_speech
 
@@ -7,7 +7,7 @@ async def get_malia_response(malia, message_buffer):
     
     # Get malia text
     malia_text = await talk_shit_with_malia(
-        user_message=message_buffer.jay_text, 
+        user_message=message_buffer.jay_text,
         malia=malia,
         message_buffer=message_buffer
     )

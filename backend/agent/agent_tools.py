@@ -10,17 +10,119 @@ from langchain.callbacks.manager import (
     CallbackManagerForToolRun,
 )
 
-from pipeline.podcast_pipeline import podcast_pipeline
-from pipeline.scraper.youtube_scraper_api import get_youtube_video_data
-from database.memory.long_term_memory import vdb
+from pipelines.podcast_pipeline import podcast_pipeline
+from pipelines.summary_pipeline import summary_pipeline
+from pipelines.twitter_pipeline import twitter_pipeline
+from pipelines.scraper.youtube_scraper_api import get_youtube_video_data
+from database.memory.long_term_memory import VDB
 
 from pydantic import BaseModel, Field
 
-# class PodcastInput(BaseModel):
-#     question: Optional[Union[str, list, dict, tuple]] = Field(description="should be a search query string text")
 
 class SummarizeVideoTool(BaseTool):
-    name = "Summarizing_a_video_or_podcast_from_youtube"
+    name = "summarizing_a_video_from_youtube"
+    description = """useful for when you are asked to summarize a video or podcast from youtube, PROVIDED only you have not seen or done \
+it before. Your input should be like this in quote: "JAY_QUERY", where JAY_QUERY fully captures \
+Jay's specified video/podcast information.
+"""
+
+    def summarize_video_tool(self, query):
+        # Get video data
+        data_res = get_youtube_video_data(query=query)
+        # Handle failed
+        if data_res["status"] != "success":
+            return """Express your annoyance because you found there is no such video.
+Tell Jay to check again and make fun of him."""
+        
+        # Extract data from response
+        url = data_res["url"]
+        title = data_res["title"]
+        video_id = data_res["video_id"]
+        channel_name = data_res["channel_name"]
+        
+        # Start the podcast_pipeline
+        pipeline_res = summary_pipeline(
+            url=url, 
+            video_id=video_id, 
+            title=title,
+            channel_name=channel_name
+        )
+        
+        # Handle failed
+        if pipeline_res["status"] != "success":
+            return """Express your annoyance because you found that the video Jay specify has no subtitles.
+Because by reading you do much faster than simply listening, if it's about listening then why doesn't Jay \
+do it himself? Make fun of him."""
+
+#             else:
+#                 
+        else:
+
+            return f"""Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
+However, you still have the request done. Now here is the full summary of the video: 
+
+FULL SUMMARY: ```{pipeline_res["summary"]}```
+
+Summarize the video according to the information above and reply to Jay in a way that's fully algined with your personality."""
+
+
+    def _run(
+        self, query, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return self.summarize_video_tool(query=query)
+
+    async def _arun(
+        self, query,
+        run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+        
+    ) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError("Tweet send does not support async")
+
+
+
+class TwitterPipelineTool(BaseTool):
+    name = "generate_tweets_from_video_summary_and_send_it"
+    description = """Useful when you are asked to make tweets from a specified video that \
+you have done summary before, and then send it.
+Your input should be EXACTLY like: ```Useful video info for the video: THE_VIDEO_TITLE ```, swap THE_VIDEO_TITLE with \
+the actual video title specific to Jay's request.
+"""
+    def twitter_pipeline_tool(self, query):
+        
+        # Load from long-term memory 
+        # Only search the best result
+        retriever = VDB.vdb.as_retriever(search_kwargs=dict(k=1))
+        relevant_video_summary = retriever.get_relevant_documents(query)[0].page_content
+        
+        # Start the twitter pipeline
+        res = twitter_pipeline(video_info=relevant_video_summary)
+        if res["status"] != "success":
+            return """Express your annoyance because you encountered some issue when sending tweets of the video summary. 
+# Tell Jay to go figure it out. You don't bother because it's not your business"""
+
+        instruction = """Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
+However, you still have the request done, now inform Jay that you have done \
+making them tweets and post them on Jay's twitter. Tell Jay to check it out"""
+
+        return instruction
+    
+    def _run(
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return self.twitter_pipeline_tool(query=question)
+
+    async def _arun(
+        self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError("Google search does not suppur async")
+
+
+class SummarizeVideoAndSendTweetsTool(BaseTool):
+    name = "summarizing_a_video_from_youtube_and_send_to_twitter"
     description = """Only useful for when you are asked to summarize a video or podcast from youtube.
 Your input should be like this in quote: "JAY_QUERY", where JAY_QUERY fully captures \
 Jay's specified video/podcast information.
@@ -75,39 +177,6 @@ and you have also make them tweets and post them on Jay's twitter. Ask Jay to ch
         return await self.summarize_video_tool(query=query)
 
 
-
-class PodcastTool(BaseTool):
-    name = "Summarizing_Andrew_Huberman_newest_Podcast"
-    description = """useful for when you are asked to summarize newest podcast episode of \
-    Andrew Huberman, The input MUST be a valid tuple.
-    """
-    # args_schema: Type[BaseModel] = PodcastInput
-
-    async def pocast_tool(self, question):
-        """Use this when Jay want you to summarize the newest podcast of Andrew Huberman. 
-    """
-        await podcast_pipeline()
-
-        return """Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
-    However, you still have the request done, now inform Jay that Andrew Huberman podcast summarization is just done \
-    and you have also make them tweets and post them on Jay's twitter. Ask Jay to check it out,"""
-
-    
-    def _run(
-        self, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool."""
-        raise NotImplementedError("Tweet send does not support async")
-
-    async def _arun(
-        self, question,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None
-        
-    ) -> str:
-        """Use the tool asynchronously."""
-        return await self.pocast_tool(question=question)
-    
-
 class SearchInput(BaseModel):
     question: str = Field(description="should be a search query")
 
@@ -119,7 +188,7 @@ to search for it, and keep the flow of the conversation aligned with you persona
     # args_schema: Type[BaseModel] = SearchInput
 
     
-    async def google_search_tool(self, query):
+    def google_search_tool(self, query):
         """Useful when you think it might be the new things you don't know. Just use this tools \
     to search for it, and keep the flow of the conversation aligned with you personality.
     """
@@ -133,38 +202,35 @@ to search for it, and keep the flow of the conversation aligned with you persona
         return instruction
     
     def _run(
-        self, run_manager: Optional[CallbackManagerForToolRun] = None
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        raise NotImplementedError("Google search does not suppur sync")
+        return self.google_search_tool(query=question)
 
     async def _arun(
         self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool asynchronously."""
-        return await self.google_search_tool(query=question)
+        raise NotImplementedError("Google search does not suppur async")
 
 
 class RecallInput(BaseModel):
     question: str = Field()
 
-class RecallFactsTool(BaseTool):
-    name = "recall_facts_between_you_and_Jay"
-    description =  """Useful when you need to recall something what Jay said before \
+class RecallConversationTool(BaseTool):
+    name = "recall_conversation_between_you_and_Jay"
+    description =  """Useful when you need to recall the converstaion you had with Jay \
 in order to chat with him and keep the flow of the conversation. Reply with your own personality.
 """
     args_schema: Type[BaseModel] = RecallInput
 
     
-    async def recall_facts_tool(self, user_input):
-        """Useful when you need to recall something what Jay said before \
-    in order to chat with him and keep the flow of the conversation. Reply with your own personality.
-    """
-        relavant_info = vdb.v_memory.load_memory_variables({"input": user_input})['history']
+    def recall_facts_tool(self, user_input):
+        relavant_info = VDB.v_memory.load_memory_variables({"input": user_input})['history']
         relavant_info = "No such memory, make fun of Jay." if relavant_info == "" else relavant_info
-        instruction = f"""You can use the following context to keep the flow of the conversation with Jay.
+        instruction = f"""You can use the following information to keep the flow of the conversation with Jay.
 
-    Revelvant piece of previous conversation:
+    Revelvant piece of information:
     {relavant_info}
 
     If the information above is not relevant, DO NOT use it.
@@ -173,17 +239,88 @@ in order to chat with him and keep the flow of the conversation. Reply with your
         return instruction
     
     def _run(
-        self, run_manager: Optional[CallbackManagerForToolRun] = None
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        raise NotImplementedError("Google search does not suppur sync")
+        return self.recall_facts_tool(user_input=question)
+        
 
     async def _arun(
         self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool asynchronously."""
-        return await self.recall_facts_tool(user_input=question)
+        raise NotImplementedError("Google search does not suppur async")
     
+    
+class RecallVideoContentTool(BaseTool):
+    name = "recall_video_content"
+    description =  """Useful when you need to recall the video summary content you have done before \
+in order to chat with Jay and keep the flow of the conversation. Reply with your own personality.
+"""
+    args_schema: Type[BaseModel] = RecallInput
+    
+    def recall_video_content_tool(self, user_input):
+        relavant_info = VDB.v_memory.load_memory_variables({"input": user_input})['history']
+        relavant_info = "No such video, never done that, make fun of Jay." if relavant_info == "" else relavant_info
+        instruction = f"""You can use the following information to keep the flow of the conversation with Jay.
+
+    Revelvant piece of information:
+    {relavant_info}
+
+    If the information above is not relevant, DO NOT use it.
+    DON'T make up something you don't remember. Simply make fun of him or something funny.
+    """
+        return instruction
+    
+    def _run(
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return self.recall_video_content_tool(user_input=question)
+        
+
+    async def _arun(
+        self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError("Google search does not suppur async")    
+
+class CheckThingsHaveDoneTool(BaseTool):
+    name = "check_if_the_task_has_been_done_before_by_you"
+    description =  """Useful when you need to check if you have done the exactly same request before. Especially for video summary, use this to check if
+it's the same video.\
+"""
+    args_schema: Type[BaseModel] = RecallInput
+    
+    def checking_if_task_has_been_done(self, user_input):
+        relavant_info = VDB.v_memory.load_memory_variables({"input": user_input})['history']
+        relavant_info = "No such video, never done that, make fun of Jay." if relavant_info == "" else relavant_info
+        instruction = f"""You can use the following information to keep the flow of the conversation with Jay.
+
+Revelvant piece of information:
+{relavant_info}
+
+Based on the information above, here are the 3 possible scenarios you should reply to Jay accordingly:
+1. If the request is NOT about video summary, you should judge the situation yourself if you want to do the same thing again.
+2. If the request IS INDEED about video summary, AND you found you have done the summary of the same video before, you should reject Jay's request in a way that's \
+fully aligned with your personality. Make a fun of him.
+3. If you found you haven't done the request before - whatever it is, you should do it by invoking the right tool.
+"""
+        return instruction
+    
+    def _run(
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool."""
+        return self.checking_if_task_has_been_done(user_input=question)
+        
+
+    async def _arun(
+        self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+    ) -> str:
+        """Use the tool asynchronously."""
+        raise NotImplementedError("Google search does not suppur async")    
+        
     
 class CodingInput(BaseModel):
     question: str = Field()
@@ -197,7 +334,7 @@ Just use plain words to explain the concepts, in a way aligned with your own per
     args_schema: Type[BaseModel] = CodingInput
 
     
-    async def coding_tool(self, query):
+    def coding_tool(self, query):
         """Useful when Jay asks you anything about coding. DON't demonstrate any code examples.
     Just use plain words to explain the concepts, in a way aligned wtih your own personality of course.
     """
@@ -210,16 +347,17 @@ Just use plain words to explain the concepts, in a way aligned with your own per
         return instruction
         
     def _run(
-        self, run_manager: Optional[CallbackManagerForToolRun] = None
+        self, question, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool."""
-        raise NotImplementedError("Coding tool does not suppur sync")
+        return self.coding_tool(query=question)
+        
 
     async def _arun(
-        self, question: str, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+        self, question, run_manager: Optional[AsyncCallbackManagerForToolRun] = None
     ) -> str:
         """Use the tool asynchronously."""
-        return await self.coding_tool(query=question)
+        raise NotImplementedError("Coding tool does not suppur async")
 
         
     
@@ -228,10 +366,13 @@ tool_names = ["llm-math"]
 tools = load_tools(llm=llm, tool_names=tool_names)
 
 tools += [
-    RecallFactsTool(),
+    RecallConversationTool(),
     GoogleSearchTool(),
     CodingTool(),
-    SummarizeVideoTool()
+    SummarizeVideoTool(),
+    CheckThingsHaveDoneTool(),
+    RecallVideoContentTool(),
+    TwitterPipelineTool()
 ]
 
 

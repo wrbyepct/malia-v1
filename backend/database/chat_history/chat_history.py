@@ -106,31 +106,3 @@ def save_chat_dialogue_to_sql(message):
 def delete_whole_chat_history_from_sql():
     chat_db.delete_table()
 
-
-
-# def get_frontend_chat_history():
-#     if os.path.exists(FRONTEND_CHAT_HISTORY_DATA):
-#         with open(FRONTEND_CHAT_HISTORY_DATA, "r", encoding="utf-8") as f:
-#             data = json.load(f)
-#         return data
-#     return []
-
-
-# def save_to_chat_history(message_data: list):
-    
-#     data = []
-#     if os.path.exists(FRONTEND_CHAT_HISTORY_DATA):
-#         with open(FRONTEND_CHAT_HISTORY_DATA, "r", encoding="utf-8") as f:
-#             data = json.load(f)
-        
-#     # Append the new messages
-#     data += message_data
-   
-#     # Write the updated content back to the file
-#     with open(FRONTEND_CHAT_HISTORY_DATA, "w", encoding="utf-8") as f:
-#         json.dump(data, f)
-
-
-# def delete_whole_chat_history():
-#     with open(FRONTEND_CHAT_HISTORY_DATA, "w", encoding="utf-8") as f:
-#         json.dump([], f)

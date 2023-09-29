@@ -27,6 +27,7 @@ def get_youtube_video_data(query):
     video = result[0]
     video_id = video["id"]
     title = video["title"]
+    channel_name = video["channel"]
     url_suffix = video["url_suffix"]
     url = "https://www.youtube.com" + url_suffix
     
@@ -34,6 +35,7 @@ def get_youtube_video_data(query):
         "status": "success",
         "video_id": video_id,
         "title": title,
-        "url": url
+        "url": url,
+        "channel_name": channel_name
     }
     return data

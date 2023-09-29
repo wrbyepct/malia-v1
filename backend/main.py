@@ -5,8 +5,8 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from agent.agent import get_agent
-from pipeline.conversation_pipeline import persist_to_memory
+from agent.agent import get_agent, check_agent_memory
+from database.memory.long_term_memory import persist_to_memory
 
 # Memory database
 from database.memory.long_term_memory import delete_vdb
@@ -94,7 +94,9 @@ async def reset_conversation():
     # Because if we don't leave the app
     # the agent will continue using the summary memory to replay
     global malia
-    malia = get_agent()
+    malia_new = get_agent()
+    malia = malia_new
+    check_agent_memory(malia)
     print("###Successfully re-initialized MALIA###")
     return {"message": "All chat history reset"}
 

@@ -1,26 +1,11 @@
-from pipeline.scraper.youtube_scraper_api import get_youtube_transcript
-from pipeline.summarizer.summary import start_summarize
-from pipeline.twitter.tweets_generator import generate_tweets
-from pipeline.twitter.tweets_sender import send_tweet_thread
+from pipelines.scraper.youtube_scraper_api import get_youtube_transcript
+from pipelines.summarizer.summary import start_summarize
+from pipelines.twitter.tweets_generator import generate_tweets
+from pipelines.twitter.tweets_sender import send_tweet_thread
 import time 
 
 
 async def podcast_pipeline(url, title, video_id):
-    
-    
-    # print("Start scraping the video transcript...")
-    # data = await start_scrape(url)
-    # print("Scraping transcript done!")
-    # print()
-
-    # if data is None:
-    #     print("The transcript is not available in this video!")
-    #     print()
-    #     return {"status": "The transcript is not available in this video"}
-    
-    # transcript = data["transcript"]
-    # url = data['url']
-    # title = data['title']
     
     print(f"This is the video title to scrape:\n{title}")
     print(f"This is the video url to scrape:\n{url}")

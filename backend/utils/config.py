@@ -15,3 +15,8 @@ NUKE_VDB = "rm -rf database/vdb/"
 
 SAPHIRA = 'aiQoNnF8hrUZ1P9BrwMw'
 VALLEY_GIRL = "E2Cf5sotGBcJZ0X8nWeQ"
+
+
+LONG_FULL_SUMMARY_FILE_PATH = "pipelines/summarizer/summary/long_full_summary.txt"
+SHORT_FULL_SUMMARY_FILE_PATH = "pipelines/summarizer/summary/short_full_summary.txt"
+CHOSEN_DOCS_SUMMARY_LIST_PATH = "pipelines/summarizer/summary/chosen_docs_summary_list.txt"

@@ -12,7 +12,7 @@ short_term_memory_model = ChatOpenAI(
 malia_model = ChatOpenAI(
     temperature=0.9, 
     model='gpt-4-0613', 
-    max_tokens=30
+    max_tokens=512
 )
 
 
@@ -32,6 +32,6 @@ advanced_summary_model = ChatOpenAI(
 malia_thought_model = ChatOpenAI(
     temperature=0.9, 
     model='gpt-4-0613',
-    max_tokens=20
+    max_tokens=25
 )
 

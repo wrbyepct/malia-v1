@@ -25,6 +25,11 @@ from agent.models import chuck_summary_model, advanced_summary_model
 
 # summary templates
 from utils.template import CHUNK_SUMMARY_TEMPLATE, FULL_SUMMARY_TEMPLATE
+from utils.config import (
+    SHORT_FULL_SUMMARY_FILE_PATH, 
+    LONG_FULL_SUMMARY_FILE_PATH,
+    CHOSEN_DOCS_SUMMARY_LIST_PATH
+)
 
 # First split the documents
 def split_text_to_docs(text):
@@ -91,7 +96,7 @@ def summarize_each_chunk(docs, selected_chunk_indices):
     # For exmamination purpose
     print("Saving each chunk into text file...")
     print()
-    with open("summary-list.txt", "a", encoding='utf-8') as f:
+    with open(CHOSEN_DOCS_SUMMARY_LIST_PATH, "w+", encoding='utf-8') as f:
         for i, summary in enumerate(summary_list, start=1):
             formatted_sum = f"Summary #{i} (chunk #{selected_chunk_indices[i-1]}) - Preview: {summary}\n\n"
             f.write(formatted_sum)
@@ -99,9 +104,14 @@ def summarize_each_chunk(docs, selected_chunk_indices):
     return summary_list
 
 
-def get_final_summary(summary_list):
+def get_final_summary(summary_list, title, url, channel_name):
     # Join the summaries as a whole paragraphs
     summaries = "\n\n".join(summary_list)
+    
+    print("Saving long full summary into text file...")
+    print()
+    with open(LONG_FULL_SUMMARY_FILE_PATH, "w", encoding='utf-8') as f:
+        f.write(summaries)
     
     # Convert it back to a document
     summaries = Document(page_content=summaries)
@@ -117,13 +127,27 @@ def get_final_summary(summary_list):
         verbose=True
     )
 
-    final_summary =final_sum_chain.run([summaries])
+    final_summary = final_sum_chain.run([summaries])
+    
+    # Save as detailed info for later tweets generation
+    video_info = f"""Useful info for the video: {title}
+VIDEO TITLE: {title}
+VIDEO LINK: {url}
+VIDEO CHANNEL NAME: {channel_name}
 
+VIDEO FULl SMMARY: {final_summary}    
+"""
+    print("Final summary done!")
+    print()
+    print("Saving final summary into text file...")
+    print()
+    with open(SHORT_FULL_SUMMARY_FILE_PATH, "w", encoding='utf-8') as f:
+        f.write(video_info)
     return final_summary
 
 
 # Bring them all together
-def start_summarize(text):
+def start_summarize(text, title, url, channel_name):
     print("Splitting text into documents...")
     print()
     docs = split_text_to_docs(text)
@@ -142,12 +166,12 @@ def start_summarize(text):
 
     print("Summarizing final summary...")
     print()
-    final_summary = get_final_summary(summary_list)
-
-    print("Saving final summary into text file...")
-    print()
-    with open("full_summary.txt", "w", encoding='utf-8') as f:
-        f.write(final_summary)
+    final_summary = get_final_summary(
+        summary_list=summary_list, 
+        title=title, 
+        url=url, 
+        channel_name=channel_name
+    )
 
     return final_summary
     

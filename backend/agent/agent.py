@@ -28,7 +28,6 @@ def get_summary_memory(data):
         sum_memory.chat_memory.messages = chat_history
         sum_memory.moving_summary_buffer = moving_summary_buffer 
     
-
     return sum_memory
 
 # Intialize agent
@@ -55,20 +54,35 @@ def get_agent():
         handle_parsing_errors=True
     )
     return agent
+
+def check_agent_memory(agent):
+    chat_history= agent.memory.chat_memory.messages
+    moving_summary_buffer = agent.memory.moving_summary_buffer
+    print("Current MALIA buffer chat history:")
+    print(chat_history)
     
-    
-    
-#     agent = initialize_agent(
-#         tools=tools,
-#         llm=ChatOpenAI(temperature=0.9, max_tokens=250, model='gpt-4'),
-#         agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-#         memory = sum_memory,
-#         verbose=True,
-#         max_iteration=3,
-#         early_stoping_method='generate',
-#         SystemMessagePromptTemplate=MALIA_INSTRUCTION
-# )
-#     agent.agent.llm_chain.prompt.messages[0].prompt.template = MALIA_INSTRUCTION
+    print("Current MALIA moving buffer summary:")
+    print(moving_summary_buffer)
+
+
+# Simpler way to initialize agent    
+def get_agent_with_simpler_way():
+    # load memory from json 
+    data = load_short_term_memory_from_json()
+
+    # Inititate ConversationSummaryMemory
+    sum_memory = get_summary_memory(data)    
+    agent = initialize_agent(
+        tools=tools,
+        llm=malia_model,
+        agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
+        memory = sum_memory,
+        verbose=True,
+        max_iteration=5,
+        early_stoping_method='generate',
+        SystemMessagePromptTemplate=MALIA_INSTRUCTION
+    )
+    agent.agent.llm_chain.prompt.messages[0].prompt.template = MALIA_INSTRUCTION
 
     # initialize Malia agent 
     # Don't need to provide prompt template first

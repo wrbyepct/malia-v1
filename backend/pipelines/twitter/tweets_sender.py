@@ -1,7 +1,7 @@
 import tweepy
 from dotenv import load_dotenv
 import os
-from pipeline.twitter.tweets_generator import rewrite_tweets
+from pipelines.twitter.tweets_generator import rewrite_tweets
 
 load_dotenv()
 
