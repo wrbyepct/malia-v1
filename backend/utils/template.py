@@ -81,6 +81,7 @@ TWEET_TOO_LONG: {tweet}
 Please rewrite it, but you need to follow these rules:
 1. Rewrite it to make it STRICTLY less than 278 characters so that it can be posted on twitter.
 2. Keep the format the same while maintaining the tone and salient point in the tweet.
+3. If it contains video link, the link itself MUST be intact.
 
 Now start rewriting! 
 REWRITTEN_TWEET:

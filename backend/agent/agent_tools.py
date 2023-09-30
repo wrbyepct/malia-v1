@@ -17,7 +17,8 @@ from pipelines.scraper.youtube_scraper_api import get_youtube_video_data
 from database.memory.long_term_memory import VDB
 
 from pydantic import BaseModel, Field
-
+from datetime import datetime
+import re
 
 class SummarizeVideoTool(BaseTool):
     name = "summarizing_a_video_from_youtube"
@@ -53,17 +54,26 @@ Tell Jay to check again and make fun of him."""
             return """Express your annoyance because you found that the video Jay specify has no subtitles.
 Because by reading you do much faster than simply listening, if it's about listening then why doesn't Jay \
 do it himself? Make fun of him."""
-
-#             else:
-#                 
+             
         else:
-
-            return f"""Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
+            intruction = f"""Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
 However, you still have the request done. Now here is the full summary of the video: 
 
 FULL SUMMARY: ```{pipeline_res["summary"]}```
 
 Summarize the video according to the information above and reply to Jay in a way that's fully algined with your personality."""
+
+            # Store job done to the long-term memory
+            current_time = datetime.now()
+            job_done_memory = f"""Finished summarizing the video: {title}
+Jay's request done.
+Time of Record: {current_time}
+"""         
+            VDB.vdb.add_texts([job_done_memory])
+            VDB.vdb.persist()
+            print("###Summary job done persist to vdb###")
+
+            return intruction
 
 
     def _run(
@@ -81,11 +91,10 @@ Summarize the video according to the information above and reply to Jay in a way
         raise NotImplementedError("Tweet send does not support async")
 
 
-
 class TwitterPipelineTool(BaseTool):
     name = "generate_tweets_from_video_summary_and_send_it"
     description = """Useful when you are asked to make tweets from a specified video that \
-you have done summary before, and then send it.
+you have done summary before, and then send it. Provided, if you haven't done the same thing before.
 Your input should be EXACTLY like: ```Useful video info for the video: THE_VIDEO_TITLE ```, swap THE_VIDEO_TITLE with \
 the actual video title specific to Jay's request.
 """
@@ -106,6 +115,24 @@ the actual video title specific to Jay's request.
 However, you still have the request done, now inform Jay that you have done \
 making them tweets and post them on Jay's twitter. Tell Jay to check it out"""
 
+        # Store this job done into long-term memory 
+        pattern = re.compile(r"VIDEO TITLE: \"(.*)\"")
+        match = pattern.search(relevant_video_summary)
+        if match:
+            video_title = match.group(1)
+        else:
+            print("Something went wrong with REGEX search")
+            return "Something went wrong with REGEX search"
+        
+        # Record current time 
+        current_time = datetime.now()
+        job_done_memory = f"""Finished making tweets from video: {video_title}
+And also sent them to Jay's twitter, Jay's request done.
+Time of Record: {current_time}
+"""
+        VDB.vdb.add_texts([job_done_memory])
+        VDB.vdb.persist()
+        print("###Tweet-sending job done persist to vdb###")
         return instruction
     
     def _run(
@@ -121,60 +148,60 @@ making them tweets and post them on Jay's twitter. Tell Jay to check it out"""
         raise NotImplementedError("Google search does not suppur async")
 
 
-class SummarizeVideoAndSendTweetsTool(BaseTool):
-    name = "summarizing_a_video_from_youtube_and_send_to_twitter"
-    description = """Only useful for when you are asked to summarize a video or podcast from youtube.
-Your input should be like this in quote: "JAY_QUERY", where JAY_QUERY fully captures \
-Jay's specified video/podcast information.
-"""
+# class SummarizeVideoAndSendTweetsTool(BaseTool):
+#     name = "summarizing_a_video_from_youtube_and_send_to_twitter"
+#     description = """Only useful for when you are asked to summarize a video or podcast from youtube.
+# Your input should be like this in quote: "JAY_QUERY", where JAY_QUERY fully captures \
+# Jay's specified video/podcast information.
+# """
 
-    async def summarize_video_tool(self, query):
-        # Get video data
-        data_res = get_youtube_video_data(query=query)
-        # Handle failed
-        if data_res["status"] != "success":
-            return """Express your annoyance because you found there is no such video.
-Tell Jay to check again and make fun of him."""
+#     async def summarize_video_tool(self, query):
+#         # Get video data
+#         data_res = get_youtube_video_data(query=query)
+#         # Handle failed
+#         if data_res["status"] != "success":
+#             return """Express your annoyance because you found there is no such video.
+# Tell Jay to check again and make fun of him."""
         
-        # Extract data from response
-        url = data_res["url"]
-        title = data_res["title"]
-        video_id = data_res["video_id"]
+#         # Extract data from response
+#         url = data_res["url"]
+#         title = data_res["title"]
+#         video_id = data_res["video_id"]
         
-        # Start the podcast_pipeline
-        pipeline_res = await podcast_pipeline(url=url, video_id=video_id, title=title)
+#         # Start the podcast_pipeline
+#         pipeline_res = await podcast_pipeline(url=url, video_id=video_id, title=title)
         
-        # Handle failed
-        if pipeline_res["status"] != "success":
+#         # Handle failed
+#         if pipeline_res["status"] != "success":
             
-            if pipeline_res["issue_source"] == "transcript":
-                return """Express your annoyance because you found that the video Jay specify has no subtitles.
-Because by reading you do much faster than simply listening, if it's about listening then why doesn't Jay \
-do it himself? Make fun of him."""
+#             if pipeline_res["issue_source"] == "transcript":
+#                 return """Express your annoyance because you found that the video Jay specify has no subtitles.
+# Because by reading you do much faster than simply listening, if it's about listening then why doesn't Jay \
+# do it himself? Make fun of him."""
 
-            else:
-                return """Express your annoyance because you encountered some issue when sending tweets of the video summary. 
-Tell Jay to go figure it out. You don't bother because it's not your business"""
-        else:
+#             else:
+#                 return """Express your annoyance because you encountered some issue when sending tweets of the video summary. 
+# Tell Jay to go figure it out. You don't bother because it's not your business"""
+#         else:
 
-            return """Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
-However, you still have the request done, now inform Jay that the video summarization is just done \
-and you have also make them tweets and post them on Jay's twitter. Ask Jay to check it out,"""
+#             return """Do express your reluctance when you hear such a request in a way that is fully match your personality. Make witty remarks.
+# However, you still have the request done, now inform Jay that the video summarization is just done \
+# and you have also make them tweets and post them on Jay's twitter. Ask Jay to check it out,"""
 
 
-    def _run(
-        self, run_manager: Optional[CallbackManagerForToolRun] = None
-    ) -> str:
-        """Use the tool."""
-        raise NotImplementedError("Tweet send does not support async")
+#     def _run(
+#         self, run_manager: Optional[CallbackManagerForToolRun] = None
+#     ) -> str:
+#         """Use the tool."""
+#         raise NotImplementedError("Tweet send does not support async")
 
-    async def _arun(
-        self, query,
-        run_manager: Optional[AsyncCallbackManagerForToolRun] = None
+#     async def _arun(
+#         self, query,
+#         run_manager: Optional[AsyncCallbackManagerForToolRun] = None
         
-    ) -> str:
-        """Use the tool asynchronously."""
-        return await self.summarize_video_tool(query=query)
+#     ) -> str:
+#         """Use the tool asynchronously."""
+#         return await self.summarize_video_tool(query=query)
 
 
 class SearchInput(BaseModel):
@@ -287,23 +314,26 @@ in order to chat with Jay and keep the flow of the conversation. Reply with your
 
 class CheckThingsHaveDoneTool(BaseTool):
     name = "check_if_the_task_has_been_done_before_by_you"
-    description =  """Useful when you need to check if you have done the exactly same request before. Especially for video summary, use this to check if
-it's the same video.\
+    description = """Useful whenever Jay asks you to do some of his bidding, you need to check if you have done the exactly same request before. 
+Especially for requests like video summary and tweets sending. Use this to check if it's the same video.\
 """
     args_schema: Type[BaseModel] = RecallInput
     
     def checking_if_task_has_been_done(self, user_input):
         relavant_info = VDB.v_memory.load_memory_variables({"input": user_input})['history']
         relavant_info = "No such video, never done that, make fun of Jay." if relavant_info == "" else relavant_info
-        instruction = f"""You can use the following information to keep the flow of the conversation with Jay.
+        instruction = f"""You can use the following information to decide whether or not you will do Jay's request.
 
 Revelvant piece of information:
 {relavant_info}
 
 Based on the information above, here are the 3 possible scenarios you should reply to Jay accordingly:
-1. If the request is NOT about video summary, you should judge the situation yourself if you want to do the same thing again.
-2. If the request IS INDEED about video summary, AND you found you have done the summary of the same video before, you should reject Jay's request in a way that's \
+1. If the request IS INDEED about video summary, tweet making or sending AND you found you have done the summary or made the \
+tweets for the SAME video and sent it before, you should REJECT Jay's request NO MATTER WHAT, in a way that's \
 fully aligned with your personality. Make a fun of him.
+
+2. If the request is NOT about video summary or tweets makig/sending, you should judge the situation yourself if you want to do the same thing again.
+
 3. If you found you haven't done the request before - whatever it is, you should do it by invoking the right tool.
 """
         return instruction

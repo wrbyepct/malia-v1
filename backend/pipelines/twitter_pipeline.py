@@ -2,8 +2,6 @@ from pipelines.twitter.tweets_generator import generate_tweets
 from pipelines.twitter.tweets_sender import send_tweet_thread
 import time 
 
-
-
 def twitter_pipeline(video_info):
     # Real-time scrape the video data
     start = time.time()
@@ -29,4 +27,6 @@ def twitter_pipeline(video_info):
     end = time.time()
     time_spent = end - start
     print(f"Time total time spent on twitter pipeline: {round(time_spent, 2)} seconds")
+    
+    
     return {"status": "success"}

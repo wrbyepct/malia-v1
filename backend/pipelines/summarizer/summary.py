@@ -131,7 +131,7 @@ def get_final_summary(summary_list, title, url, channel_name):
     
     # Save as detailed info for later tweets generation
     video_info = f"""Useful info for the video: {title}
-VIDEO TITLE: {title}
+VIDEO TITLE: "{title}"
 VIDEO LINK: {url}
 VIDEO CHANNEL NAME: {channel_name}
 

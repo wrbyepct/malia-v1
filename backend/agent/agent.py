@@ -20,6 +20,7 @@ def get_summary_memory(data):
         max_token_limit=200,
         return_messages=True
     )
+    
     # If there's short-term memory in json, load them to model
     if data:
         chat_history = messages_from_dict(data['short_term_chat_history'])
