@@ -141,7 +141,7 @@ Express your annoyance in your thought bubble, something that shouldn't be heard
 Strictly restrict your reply within 20 words
 DO NOT express the words: 'nonsense', 'Jay', 'ugh'
 
-THOUGHT BUBBLE:```
+THOUGHT BUBBLE: YOUR THOUGH HERE```
 """
 
 
